@@ -30,11 +30,78 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.grey[900],
       ),
       body: FutureBuilder(
-          future: getNotes(),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<NoteModel>> snapshot) {
-            print(snapshot);
-            if (snapshot.hasData) {
+        future: getNotes(),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<NoteModel>> snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.grey[900],
+                child: Center(
+                  child: SizedBox(
+                    child: CircularProgressIndicator(
+                      color: Colors.amber,
+                    ),
+                    height: 60,
+                    width: 60,
+                  ),
+                ),
+              );
+            case ConnectionState.done:
+              if (snapshot.data!.isNotEmpty)
+                return Container(
+                  padding: EdgeInsets.only(
+                    left: 15.0,
+                    right: 15.0,
+                    top: 10.0,
+                    bottom: 5.0,
+                  ),
+                  color: Colors.grey[900],
+                  child: ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return Note(
+                        note: snapshot.data![index],
+                      );
+                    },
+                  ),
+                );
+              else
+                return Container(
+                  padding: EdgeInsets.only(
+                    left: 15.0,
+                    right: 15.0,
+                    top: 10.0,
+                    bottom: 5.0,
+                  ),
+                  color: Colors.grey[900],
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Icon(
+                        Icons.stacked_bar_chart_sharp,
+                        color: Colors.amber,
+                        size: 80.0,
+                      ),
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      Text(
+                        "You don't have note.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          letterSpacing: 2.0,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+            default:
               return Container(
                 padding: EdgeInsets.only(
                   left: 15.0,
@@ -43,49 +110,33 @@ class _HomeState extends State<Home> {
                   bottom: 5.0,
                 ),
                 color: Colors.grey[900],
-                child: ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    return Note(
-                      note: snapshot.data![index],
-                    );
-                  },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Icon(
+                      Icons.stacked_bar_chart_sharp,
+                      color: Colors.amber,
+                      size: 80.0,
+                    ),
+                    SizedBox(
+                      height: 30.0,
+                    ),
+                    Text(
+                      "You don't have note.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        letterSpacing: 2.0,
+                        color: Colors.amber,
+                      ),
+                    ),
+                  ],
                 ),
               );
-            }
-            return Container(
-              padding: EdgeInsets.only(
-                left: 15.0,
-                right: 15.0,
-                top: 10.0,
-                bottom: 5.0,
-              ),
-              color: Colors.grey[900],
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Icon(
-                    Icons.stacked_bar_chart_sharp,
-                    color: Colors.amber,
-                    size: 80.0,
-                  ),
-                  SizedBox(
-                    height: 30.0,
-                  ),
-                  Text(
-                    "You don't have note.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      letterSpacing: 2.0,
-                      color: Colors.amber,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
+          }
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.amber,
         onPressed: () {
@@ -105,3 +156,7 @@ class _HomeState extends State<Home> {
 //               onPressed: () {},
 //               child: Icon(Icons.note_add),
 //             ),
+
+
+
+            

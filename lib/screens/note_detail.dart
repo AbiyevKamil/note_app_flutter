@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_app/database/database_provider.dart';
 import 'package:note_app/models/note_model.dart';
 
 class NoteDetail extends StatefulWidget {
@@ -12,15 +13,18 @@ class NoteDetail extends StatefulWidget {
 class _NoteDetailState extends State<NoteDetail> {
   late TextEditingController titleController;
   late TextEditingController bodyController;
+  int? id;
   @override
   void initState() {
     super.initState();
     titleController = TextEditingController(text: widget.note.title);
     bodyController = TextEditingController(text: widget.note.body);
+    id = widget.note.id;
   }
 
   @override
   Widget build(BuildContext context) {
+    print(widget.note.id);
     return Scaffold(
       appBar: AppBar(
         title: TextField(
@@ -104,7 +108,8 @@ class _NoteDetailState extends State<NoteDetail> {
           )),
       floatingActionButton: TextButton.icon(
         onPressed: () async {
-          
+          await DatabaseProvider.db.deleteNote(id!);
+          print('deleted');
         },
         icon: Icon(
           Icons.delete,

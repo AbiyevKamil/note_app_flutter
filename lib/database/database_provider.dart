@@ -37,13 +37,20 @@ class DatabaseProvider {
     }
   }
 
+  deleteNote(int id) async {
+    final db = await database;
+    if (db != null) {
+      db.delete('notes', where: "id = ?", whereArgs: [id]);
+    }
+  }
+
   Future<dynamic> getNotes() async {
     List<NoteModel> notesList = [];
     final db = await database;
     if (db != null) {
       final res = await db.query("notes");
       if (res.length == 0) {
-        return null;
+        return notesList;
       } else {
         final resMap = res.toList();
         for (var i = 0; i < resMap.length; i++) {
@@ -55,15 +62,8 @@ class DatabaseProvider {
               NoteModel(title: title, body: body, date: date, id: id);
           notesList.add(noteModel);
         }
-        return notesList.isNotEmpty ? notesList : null;
+        return notesList;
       }
     }
   }
 }
-
-// deleteNote(int id) async {
-//     final db = await database;
-//     if (db != null) {
-//       db.delete('notes', where: "id = ?", whereArgs: [id]);
-//     }
-//   }
