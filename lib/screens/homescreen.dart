@@ -16,6 +16,16 @@ class _HomeState extends State<Home> {
     return notes;
   }
 
+  //  bu funksiyani widget agacinda asagilara gonderib ise saliriq ve bu funksiya agacda yuxarida yerlesdiyine gore
+  //  yuxaridan asagiya kimi butun stateler deyisecek, bize esas deyismesi lazim olan yer buradi cunki ona gore burda
+  //  yaziriq bu funksiyani. bu yontem bele kicik appler ucun islene biler ama biraz boyuk app olsa qetiyyen bele birsey
+  //  etmemelisen, onun yerine state management ishletmelisen.
+  void stateChanger(Function f) {
+    setState(() {
+      f();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,83 +74,29 @@ class _HomeState extends State<Home> {
                     itemBuilder: (context, index) {
                       return Note(
                         note: snapshot.data![index],
+                        stateChanger: stateChanger,
                       );
                     },
                   ),
                 );
               else
-                return Container(
-                  padding: EdgeInsets.only(
-                    left: 15.0,
-                    right: 15.0,
-                    top: 10.0,
-                    bottom: 5.0,
-                  ),
-                  color: Colors.grey[900],
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Icon(
-                        Icons.stacked_bar_chart_sharp,
-                        color: Colors.amber,
-                        size: 80.0,
-                      ),
-                      SizedBox(
-                        height: 30.0,
-                      ),
-                      Text(
-                        "You don't have note.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          letterSpacing: 2.0,
-                          color: Colors.amber,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+                return _buildNoteDoesNotExist();
+
             default:
-              return Container(
-                padding: EdgeInsets.only(
-                  left: 15.0,
-                  right: 15.0,
-                  top: 10.0,
-                  bottom: 5.0,
-                ),
-                color: Colors.grey[900],
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Icon(
-                      Icons.stacked_bar_chart_sharp,
-                      color: Colors.amber,
-                      size: 80.0,
-                    ),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                    Text(
-                      "You don't have note.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        letterSpacing: 2.0,
-                        color: Colors.amber,
-                      ),
-                    ),
-                  ],
-                ),
-              );
+              return _buildNoteDoesNotExist();
           }
         },
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.amber,
         onPressed: () {
-          Navigator.pushNamed(context, 'addNote');
+          // biz add_note.dart-a isdeyirikki state changer funksiyasini gonderib sora nese elave eliyende
+          // home screende o elave olunan note hemen an gorunsun bunun ucun homescreendeki stateni deyismek lazimdi
+          // bunun ucun biz state deyisen funksiyani add_note.dart-a gondermeliyik, is orasidi bunu route yolla edirik
+          // deye konstruktor yoluyla data oturenmirik ona gore pushNamed-de ikinci parametr olaraq arguments var,
+          // sen buna istediyin tipli obyekti assign ede bilersen ama tipini Object olaraq gorecek sonra bunu goturende
+          // ne gondermisense ona cast(kəsmək) elemelisen
+          Navigator.pushNamed(context, 'addNote', arguments: stateChanger);
         },
         child: Icon(
           Icons.note_add,
@@ -150,13 +106,41 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+
+  // bunu sen hem default casede hem de else case de isletmisdin, calish DIY (don't repeat yourself) bele hallarda
+  // bir ayrica metod yada widget olaraq yaz ki tekrar olmasin.
+  Widget _buildNoteDoesNotExist() {
+    return new Container(
+      padding: EdgeInsets.only(
+        left: 15.0,
+        right: 15.0,
+        top: 10.0,
+        bottom: 5.0,
+      ),
+      color: Colors.grey[900],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Icon(
+            Icons.stacked_bar_chart_sharp,
+            color: Colors.amber,
+            size: 80.0,
+          ),
+          SizedBox(
+            height: 30.0,
+          ),
+          Text(
+            "You don't have note.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              letterSpacing: 2.0,
+              color: Colors.amber,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
-
-// FloatingActionButton(
-//               onPressed: () {},
-//               child: Icon(Icons.note_add),
-//             ),
-
-
-
-            

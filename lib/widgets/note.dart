@@ -4,7 +4,9 @@ import 'package:note_app/screens/note_detail.dart';
 
 class Note extends StatefulWidget {
   final NoteModel note;
-  const Note({Key? key, required this.note}) : super(key: key);
+  const Note({Key? key, required this.note, required this.stateChanger})
+      : super(key: key);
+  final Function stateChanger;
 
   @override
   _NoteState createState() => _NoteState();
@@ -13,18 +15,48 @@ class Note extends StatefulWidget {
 class _NoteState extends State<Note> {
   late String title;
   late String body;
-  late NoteModel note;
+
+  // late NoteModel note;
+
+  // Note classindaki  NoteModel nota  access etmek ucun widget.note elemeyin besdi
+  // yox eger deyirsenki men isdeyirem mutleq State-in icinde olsun onda buildin icinde setState
+  // elemekdense  initState metodunu islet, initState ilk defe state yuklenende ishe dushen metoddu,
+  // burda sen ilk defe yuklenende initialize olunmasi lazim olan modelleri initialize edirsen, meselen database kimi
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   this.note = widget.note;
+  // }
+
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      note = widget.note;
-    });
+    // setState(() {
+    //   note = widget.note;
+    // });
+
     return InkWell(
-      onTap: () {
+      onTap: () async {
         print('tapped item');
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => NoteDetail(note: note)));
+
+        // demeli bu navigatorlarin metodlari eslinde Featuredi,(jsdaki Promise), sen bundan geri deyer gozluye bilersen,
+        //demeli appde esas problem oduki note silinen kimi ana ekranda deyisiklik olmur yeni silinmemis kimi olur
+        // halbuki hot reload eliyende gorurukki eslinde silinib ama state deyisilmeyib, indi biz burda deyer gozduyeciyik
+        // eger true gelibse demeli silmisik bu zaman stateni deyiseciyik yox eger normal yolla geri qaytarmisiqsa
+        //demeli false gelecek onda deymiyeciyik
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => NoteDetail(
+                    note: widget.note, stateChanger: widget.stateChanger)));
+
+        // if (isDeleted) {
+        //   setState(() {});
+        // }
       },
+
+      // hazir Card ile de yazmaq olardi ama custom yazanda daha cox  oyrenirsen, ela!
       child: Container(
         color: Colors.amber,
         margin: EdgeInsets.only(bottom: 15.0),
@@ -34,7 +66,7 @@ class _NoteState extends State<Note> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              note.title,
+              widget.note.title,
               style: TextStyle(
                 fontSize: 20,
                 color: Colors.grey[900],
@@ -44,7 +76,7 @@ class _NoteState extends State<Note> {
               height: 10.0,
             ),
             Text(
-              note.body,
+              widget.note.body,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[900],

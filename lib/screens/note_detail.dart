@@ -4,21 +4,19 @@ import 'package:note_app/models/note_model.dart';
 
 class NoteDetail extends StatefulWidget {
   final NoteModel note;
-  const NoteDetail({Key? key, required this.note}) : super(key: key);
+  final Function stateChanger;
+  const NoteDetail({Key? key, required this.note, required this.stateChanger})
+      : super(key: key);
 
   @override
   _NoteDetailState createState() => _NoteDetailState();
 }
 
 class _NoteDetailState extends State<NoteDetail> {
-  late TextEditingController titleController;
-  late TextEditingController bodyController;
   int? id;
   @override
   void initState() {
     super.initState();
-    titleController = TextEditingController(text: widget.note.title);
-    bodyController = TextEditingController(text: widget.note.body);
     id = widget.note.id;
   }
 
@@ -27,37 +25,13 @@ class _NoteDetailState extends State<NoteDetail> {
     print(widget.note.id);
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: titleController,
-          maxLines: 1,
+        title: Text(
+          widget.note.body,
           style: TextStyle(
             color: Colors.amber,
             fontSize: 22,
           ),
-          cursorColor: Colors.amber,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: "Title",
-            hintStyle: TextStyle(
-              color: Colors.amber,
-              fontSize: 22,
-            ),
-          ),
         ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              print('tapped');
-            },
-            style: TextButton.styleFrom(
-              primary: Colors.amber,
-            ),
-            child: Icon(
-              Icons.save,
-              color: Colors.amber,
-            ),
-          ),
-        ],
         leading: BackButton(
           color: Colors.amber,
         ),
@@ -87,29 +61,26 @@ class _NoteDetailState extends State<NoteDetail> {
               SizedBox(
                 height: 25.0,
               ),
-              TextField(
-                controller: bodyController,
-                maxLines: 1,
-                style: TextStyle(
-                  color: Colors.amber,
-                  fontSize: 22,
-                ),
-                cursorColor: Colors.amber,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Add your note content here",
-                  hintStyle: TextStyle(
+              Container(
+                child: Text(
+                  widget.note.title,
+                  style: TextStyle(
                     color: Colors.amber,
                     fontSize: 22,
                   ),
                 ),
-              ),
+              )
             ],
           )),
       floatingActionButton: TextButton.icon(
         onPressed: () async {
           await DatabaseProvider.db.deleteNote(id!);
           print('deleted');
+
+          // silen kimi movcud ekrani sil (bilinsinki silindi)
+          widget.stateChanger(() {
+            Navigator.pop(context);
+          });
         },
         icon: Icon(
           Icons.delete,

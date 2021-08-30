@@ -15,13 +15,22 @@ class _AddNoteState extends State<AddNote> {
   late String body;
   late DateTime date;
 
-  addNote(NoteModel note) {
-    DatabaseProvider.db.addNewNote(note);
+  addNote(NoteModel note) async {
+    await DatabaseProvider.db.addNewNote(note);
     print('Added successfully');
   }
 
   @override
   Widget build(BuildContext context) {
+    //  homescreen.dart -dan bize gleen datani gotururuk ama tipi Objectdi deye biz bunu Functiona cast edirik
+    //  javada cast etme bu curdu -> (Function) ....arguments,
+    //  ama dartda as Function edirik c#-a oxsuyur :)
+    //  Not: men gonderdiyim datanin kankret Function oldugunu bildiyim ucun Functiona cast edirem
+    //  eger bashga sey gonderseydim Functiona cast edenmezdim etseydim exception atasiydi
+
+    Function stateChanger =
+        ModalRoute.of(context)?.settings.arguments as Function;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -84,7 +93,7 @@ class _AddNoteState extends State<AddNote> {
       ),
       floatingActionButton: FloatingActionButton.extended(
           backgroundColor: Colors.amber,
-          onPressed: () {
+          onPressed: () async {
             if (titleController.text.isNotEmpty &&
                 bodyController.text.isNotEmpty) {
               setState(() {
@@ -92,10 +101,16 @@ class _AddNoteState extends State<AddNote> {
                 body = bodyController.text;
                 date = DateTime.now();
               });
-              NoteModel note =
-                  NoteModel(title: title, body: body, date: date, id: 1);
-              addNote(note);
-              Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+              NoteModel note = NoteModel(title: title, body: body, date: date);
+              await addNote(note);
+              // Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+
+              // homescreen.dart-daki stateChanger parametr olaraq funksiya goturur
+              // ve stateni deyisende o funksiyani ise salir indi biz parametr olaraq lambda/arrow/anonymous funksiya
+              // gonderirik
+              stateChanger(() {
+                Navigator.pop(context);
+              });
             }
           },
           label: Text(
